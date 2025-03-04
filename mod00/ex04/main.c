@@ -5,7 +5,6 @@ int on_released(uint8_t P_ID) {
 	volatile uint8_t  i = 0;
 
 	if (!(PIND & (1 << P_ID))) {
-		//delay for avoid bonce effect
 		_delay_ms(20);
 		i++;
 	}
@@ -40,7 +39,7 @@ int main() {
 		PORTB |= ((value & (1 << 0)));
 		PORTB |= ((value & (1 << 1)));
 		PORTB |= ((value & (1 << 2)));
-		PORTB |= ((value & (1 << 3)) << 1);
+		PORTB |= ((value & (1 << 3)) << 1); // shift one for correct pin 4
 
 	}
 }

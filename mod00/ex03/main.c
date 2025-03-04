@@ -8,9 +8,9 @@ int main() {
 
 	while (1) {
 		i = 0;
-		// double if for release type input button
+		// double if with value for release type input button
 		if (!(PIND & (1 << PD2))) {
-			//delay for avoid bonce effect
+			//delay for avoid bonce effect 
 			_delay_ms(20);
 			i++;
 		}
@@ -18,6 +18,7 @@ int main() {
 			i++;
 		}
 
+		// if press and release this condition is true and inverse toggle the led
 		if (i == 2) {
 			PORTB ^= (1 << PB0);
 		}

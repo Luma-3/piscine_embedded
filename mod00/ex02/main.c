@@ -5,8 +5,8 @@ int main() {
 	PORTB &= ~(1 << PB0);
 
 	while (1) {
-		// PIND is input read 
-		if (!(PIND & (1 << PD2))) {
+		// PINX is input read only register, D for secteur and PIND2 for selec correct pin to read
+		if (!(PIND & (1 << PIND2))) {
 			PORTB |= (1 << PB0);
 		}
 		else {
