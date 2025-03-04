@@ -1,31 +1,25 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#ifndef F_CPU
-#define F_CPU 16000000UL
-#endif
-
 #define CLOCK F_CPU / 1024
 
-int on_press(uint8_t PIN) {
-	volatile uint8_t i = 0;
-	if (!(PIND & (1 << PIN))) {
-		_delay_ms(20);
-		i++;
-	}
-	if ((PIND & (1 << PIN))) {
-		i++;
-	}
+struct button
+{
+	uint8_t pin;
+	uint8_t last_state;
+};
 
-	if (i == 2) {
-		return 1;
-	}
-	return 0;
+int on_pressed(struct button *button) {
+	uint8_t current_state = (PIND & (1 << button->pin)) ? 1 : 0;
+	_delay_ms(20);
+	uint8_t result = (button->last_state == 1 && current_state == 0);
+	button->last_state = current_state;
+	return result;
 }
 
 
 int main() {
-	DDRB |= (1 << PB1);
+	DDRB |= (1 << PB1) | (1 << PB0);
 	float value = 0.1;
 
 	// COM1A1 for clean OC1A on match
@@ -35,23 +29,30 @@ int main() {
 	TCCR1B |=  (1 << CS12) | (1 << CS10) | (1 << WGM12) | (1 << WGM13);
 	
 	//OCR1A is limite for down flag (because COM1A1 is active) see (page 108 in https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf) 
-	OCR1A = CLOCK * value;
+	OCR1A = (uint16_t)CLOCK * value;
 	// ICR1 is limite of periode (TOP) 
 	ICR1 = CLOCK ;
+
+	struct button b1 = {PIND2, 1};
+	struct button b2 = {PIND4, 1};
 
 
 	while (1) {
 
-		if (on_press(PIND2)) {
+		if (on_pressed(&b1)) {
 			if (value < 1) {
 				value += 0.1;
 			}
 		}
 
-		if (on_press(PIND4)) {
-			if (value > 0.1) {
+		if (on_pressed(&b2)) {
+			//0.11 , 0.01 is add for adjust float calculating inaccuracy
+			if (value > 0.11) {
 				value -= 0.1;
-				
+				PORTB |= (1 << PB0);
+				_delay_ms(250);
+				PORTB &= ~(1 << PB0);
+
 			}
 		}
 		OCR1A = CLOCK * value;
