@@ -2,6 +2,7 @@
 	"files.associations": {
 		"*.tpp": "cpp",
 		"io.h": "c",
-		"cstdint": "c"
+		"cstdint": "c",
+		"uart.h": "c"
 	}
 }
