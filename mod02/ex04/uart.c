@@ -17,12 +17,17 @@ void uart_init(unsigned int ubrr) {
 	 * 
 	 * @details (page 160 in https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf)
 	 */ 
-	UCSR0B |= (1 << TXEN0);
+	UCSR0B |= (1 << TXEN0) | (1 << RXEN0);
 
 	/**
 	 * UCSZ00 is start of 3 bit part of register for set how many bits are use for data
 	 */
 	UCSR0C |= (1 << UCSZ00) | (1 << UCSZ01);
+}
+
+void uart_rx_interupt_enable() {
+	// Active Interupt for Rx 
+	UCSR0B |= (1 << RXCIE0);
 }
 
 void uart_tx(char c) {
@@ -32,6 +37,11 @@ void uart_tx(char c) {
 	UDR0 = c;
 }
 
+char uart_rx(void) {
+	// wait for all transmited data
+	while (!(UCSR0A & (1 << RXC0)));
+	return UDR0;
+}
 
 void uart_printstr(const char *str) {
 	while(*str) {
