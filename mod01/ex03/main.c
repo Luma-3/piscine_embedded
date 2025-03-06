@@ -2,6 +2,7 @@
 #include <util/delay.h>
 
 #define CLOCK F_CPU / 1024
+#define EPSILON 0.01
 
 struct button
 {
@@ -16,6 +17,7 @@ int on_pressed(struct button *button) {
 	button->last_state = current_state;
 	return result;
 }
+
 
 
 int main() {
@@ -46,13 +48,9 @@ int main() {
 		}
 
 		if (on_pressed(&b2)) {
-			//0.11 , 0.01 is add for adjust float calculating inaccuracy
-			if (value > 0.11) {
+			//0.11 , EPSILON is add for adjust float calculating inaccuracy
+			if (value > 0.1 + EPSILON) {
 				value -= 0.1;
-				PORTB |= (1 << PB0);
-				_delay_ms(250);
-				PORTB &= ~(1 << PB0);
-
 			}
 		}
 		OCR1A = CLOCK * value;
