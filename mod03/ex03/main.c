@@ -59,7 +59,6 @@ void get_hex(char *buffer) {
 uint8_t hex_to_uint8(const char *hex) {
 	uint8_t high =	(hex[0] >= '0' && hex[0] <= '9') ? hex[0] - '0' : hex[0] - 'a' + 10;
 	uint8_t low =	(hex[1] >= '0' && hex[1] <= '9') ? hex[1] - '0' : hex[1] - 'a' + 10; 
-
 	return (high << 4) | low;
 }
 
@@ -68,7 +67,7 @@ void init_rgb() {
 	TCCR0A |= (1 << WGM00) | (1 << WGM01) | (1 << COM0A1) | (1 << COM0B1); // Fast PWM Clear OCR0A OCR0B
 	TCCR0B |= (1 << CS00); // Active  Timer divid 1
 	TCCR2A |= (1 << WGM20) | (1 << WGM21) | (1 << COM2B1); // Fast PWM  Clear OCR2B
-	TCCR2B |= (1 << CS20);// Active  Timer divid 1
+	TCCR2B |= (1 << CS20); // Active  Timer divid 1
 }
 
 void set_rgb(uint8_t r, uint8_t g, uint8_t b) {
@@ -82,9 +81,10 @@ int main() {
 	init_rgb();
 
 	while (1) {
-		char buff[6] = "";
+		char buff[6] = "000000";
 
 		get_hex(buff);
 		set_rgb(hex_to_uint8(buff), hex_to_uint8(buff + 2), hex_to_uint8(buff + 4));
+		uart_printstr("\r\n");
 	}
 }
