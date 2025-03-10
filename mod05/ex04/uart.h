@@ -16,6 +16,7 @@ void uart_printstr(const char *str);
 void uart_rx_interupt_enable();
 
 void uart_print_hex(uint8_t value);
+void uart_print_num(uint16_t value);
 
 #endif // _UART_H
 

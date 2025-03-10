@@ -27,6 +27,8 @@
 		"locale": "cpp",
 		"vector": "cpp",
 		"timer.h": "c",
-		"interrupt.h": "c"
+		"interrupt.h": "c",
+		"iom328.h": "c",
+		"iom328p.h": "c"
 	}
 }

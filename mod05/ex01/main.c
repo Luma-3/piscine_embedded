@@ -8,7 +8,7 @@
 void adc_init() {
 	ADMUX |= BV(REFS0) |  BV(ADLAR); // To active AVcc external | ADLAR for left adjust (8 - bit);
 
-	ADCSRA = BV(ADEN) | BV(ADPS2) | BV(ADPS1); // Prescaler (ADPS2 | ADPS1) for 64 prescale (precise convertion echantillonage)
+	ADCSRA = BV(ADEN) | BV(ADPS2) | BV(ADPS1);
 
 	ADCSRA |= BV(ADEN); // to activate adc !
 }
@@ -26,9 +26,16 @@ uint8_t adc_read(uint8_t channel) {
 int main() {
 	uart_init(UBRR);
 	adc_init();
+	uint8_t value = 0;
 
 	while (1) {
-		uint8_t value = adc_read(0);
+		value = adc_read(0);
+		uart_print_hex(value);
+		uart_printstr(", ");
+		value = adc_read(1);
+		uart_print_hex(value);
+		uart_printstr(", ");
+		value = adc_read(2);
 		uart_print_hex(value);
 		uart_printstr("\r\n");
 		_delay_ms(20);
