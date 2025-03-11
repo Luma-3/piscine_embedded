@@ -2,9 +2,12 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
+#define _SEI() {SREG |= (1<< SREG_I);}
+
+volatile uint8_t flag = 0;
+
 ISR(INT0_vect) {
-	_delay_ms(50);
-	PORTB ^= (1 << PB0);
+	flag = 1;
 }
 
 int main() {
@@ -12,7 +15,13 @@ int main() {
 
 	EICRA |= (1 << ISC01);
 	EIMSK |= (1 << INT0);
-	sei();
+	_SEI();
 
-	while (1);
+	while (1) {
+		if (flag == 1){
+			PORTB ^= (1 << PB0);
+			_delay_ms(200);
+			flag = 0;
+		}
+	}
 }

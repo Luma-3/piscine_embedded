@@ -2,6 +2,9 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#define _SEI() {SREG |= (1<< SREG_I);}
+
+
 void refresh(uint8_t value) {
 	PORTB &= ~((1 << PB0) | (1 << PB1) | (1 << PB2) | (1 << PB4));
 	PORTB |= ((value & (1 << 0)));
@@ -38,7 +41,7 @@ int main() {
 	EICRA |= (1 << ISC01); 
 	EIMSK |= (1 << INT0);
 
-	sei();
+	_SEI();
 
 	while (1);
 	

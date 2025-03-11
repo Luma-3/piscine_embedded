@@ -7,6 +7,9 @@
 volatile uint8_t duty_cycle = 0;
 volatile int8_t step = 1;
 
+#define _SEI() {SREG |= (1<< SREG_I);}
+
+
 ISR(TIMER0_COMPA_vect) {
 	static uint8_t counter = 0;
 
@@ -35,6 +38,6 @@ int main() {
 
 	TIM1_SET_OCR1A(duty_cycle);
 
-	sei();
+	_SEI();
 	while (1);
 }
