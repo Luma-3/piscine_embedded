@@ -47,7 +47,7 @@ float get_temp() {
 	 *	  -40 = 210.6 + b
 	 *
 	 *		b = -40 - 210.6
-	 * 		b = 250.6
+	 * 		b = -250.6
 	 * 
 	 * linear function : ax+b
 	 */

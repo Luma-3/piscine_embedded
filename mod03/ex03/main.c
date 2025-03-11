@@ -63,7 +63,7 @@ uint8_t hex_to_uint8(const char *hex) {
 }
 
 void init_rgb() {
-	DDRD |= R | G | B;
+
 	TCCR0A |= (1 << WGM00) | (1 << WGM01) | (1 << COM0A1) | (1 << COM0B1); // Fast PWM Clear OCR0A OCR0B
 	TCCR0B |= (1 << CS00); // Active  Timer divid 1
 	TCCR2A |= (1 << WGM20) | (1 << WGM21) | (1 << COM2B1); // Fast PWM  Clear OCR2B
@@ -71,9 +71,19 @@ void init_rgb() {
 }
 
 void set_rgb(uint8_t r, uint8_t g, uint8_t b) {
-	OCR0A = g;
-	OCR0B = r;
-	OCR2B = b;
+	DDRD &= ~( R | G | B); 
+	if (r != 0) {
+		DDRD |= R;
+		OCR0B = r;
+	}
+	if (g != 0) {
+		DDRD |= G;
+		OCR0A = g;
+	}
+	if (b != 0) {
+		DDRD |= B;
+		OCR2B = b;
+	}
 }
 
 int main() {

@@ -20,7 +20,12 @@ void i2c_start() {
 	TWCR = BV(TWINT) | BV(TWEN);
 	while (!(TWCR & BV(TWINT)));
 	uart_print_hex(TWSR & 0xF8);
+}
 
+void i2c_write(unsigned char data) {
+	TWDR = data;
+	TWCR = BV(TWINT) | BV(TWEN);
+	while (!(TWCR & BV(TWINT)));
 }
 
 void i2c_stop() {
@@ -30,8 +35,13 @@ void i2c_stop() {
 int main() {
 	uart_init(UBRR);
 	i2c_init();
+
+	_delay_ms(40);
+
 	_loop() {
 		i2c_start();
+		i2c_write(0xAC);
+
 		i2c_stop();
 		uart_printstr("\r\n");
 	}
