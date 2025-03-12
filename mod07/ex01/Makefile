@@ -19,7 +19,8 @@ DIR_BIN = bin
 
 SRC_DIR		=	src/
 SRC_FILE	=	main.c	\
-	 			uart.c
+	 			uart.c	\
+				eeprom.c
 SRC = $(addprefix $(SRC_DIR), $(SRC_FILE));
 	  
 INCLUDE = -I./inc

@@ -19,5 +19,8 @@ void uart_print_hex(uint8_t value);
 void uart_print_num(uint16_t value);
 
 
+char get_char(uint8_t echo, uint8_t (*constraint)(char c));
+void get_input(char *buffer, int buffer_size, const char *label, uint8_t (*constraint)(char c));
+
 #endif // _UART_H
 
