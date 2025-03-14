@@ -11,7 +11,7 @@ PROG		=	arduino
 # baud is a unit of transmission speed fond in preambule module 00
 BAUD		=	115200
 # default Port usb find in doc arduino
-PORT		=	/dev/ttyUSB0
+PORT		=	/dev/ttyUSB1
 
 
 NAME = main

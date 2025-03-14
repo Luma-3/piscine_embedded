@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <avr/interrupt.h>
+
 
 #define SPI_DDR    DDRB
 #define SPI_PORT   PORTB
@@ -60,8 +62,32 @@ void sk9822_init() {
 }
 
 
-uint8_t constraint(char c) {
+void wheel(uint8_t pos) {
+	pos = 255 - pos;
+	if (pos < 85) {
+		sk9822_set_color(0, 31, 255 - pos * 3, 0, pos * 3);
+		sk9822_set_color(1, 31, 255 - pos * 3, 0, pos * 3);
+		sk9822_set_color(2, 31, 255 - pos * 3, 0, pos * 3);
+	} else if (pos < 170) {
+		pos = pos - 85;
+		sk9822_set_color(0, 31, 0, pos * 3, 255 - pos * 3);
+		sk9822_set_color(1, 31, 0, pos * 3, 255 - pos * 3);
+		sk9822_set_color(2, 31, 0, pos * 3, 255 - pos * 3);
+	} else {
+		pos = pos - 170;
+		sk9822_set_color(0, 31, pos * 3, 255 - pos * 3, 0);
+		sk9822_set_color(1, 31, pos * 3, 255 - pos * 3, 0);
+		sk9822_set_color(2, 31, pos * 3, 255 - pos * 3, 0);
+	}
+}
+
+
+uint8_t is_hex(char c) {
 	return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || c == 'D');
+}
+
+uint8_t constraint(char c) {
+	return (c >= 32 && c <= 126);
 }
 
 void hex_to_rgb(const char* hex, uint8_t* red, uint8_t* green, uint8_t* blue) {
@@ -69,10 +95,25 @@ void hex_to_rgb(const char* hex, uint8_t* red, uint8_t* green, uint8_t* blue) {
 }
 
 void parse_input(const char *input) {
+
+	if (strlen(input) == 11 && strncmp(input, "FULLRAINBOW", 11) == 0){
+		TCCR0B |= BV(CS00) | BV(CS02) ;
+		return;
+	} 
 	if (strlen(input) != 8) {
 		uart_printstr("format Error\r\n");
 		return;
 	}
+	uint8_t i = 0;
+	while(input[i]) {
+		if (!is_hex(input[i])) {
+			uart_printstr("format Error\r\n");
+			return;
+		}
+		i++;
+	}
+
+	TCCR0B &= ~(BV(CS00) | BV(CS02));
 
 	char hex_color[7];
 	char led_id_str[3];
@@ -98,18 +139,34 @@ void parse_input(const char *input) {
 		sk9822_set_color(led_id, 31, red, green, blue);
 	}
 	else {
-		uart_printstr("Wrong led id");
+		uart_printstr("Wrong led id\r\n");
 	}
 }
 
+uint8_t wheel_val = 0;
+
+ISR(TIMER0_OVF_vect) {
+	wheel_val++;
+	wheel(wheel_val);
+	sk9822_show();
+}
+
+void init_timer() {
+	TCCR0A |= (1 << WGM00) | (1 << WGM01); // Fast PWM Clear OCR0A
+	TIMSK0 |= BV(TOIE0);
+}
+
 int main() {
+
 	uart_init(UBRR);
 	SPI_init();
 	sk9822_init();
 	sk9822_show();
+	init_timer();
+	_SEI()
 	_loop() {
-		char buff[9] = "";
-		get_input(buff, 8, "LED SPI #", &constraint);
+		char buff[12] = "";
+		get_input(buff, 11, "LED SPI #", &constraint);
 		uart_printstr("\r\n");
 		parse_input(buff);
 		sk9822_show();
